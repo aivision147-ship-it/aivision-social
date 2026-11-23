@@ -1,0 +1,19 @@
+name: decode-images
+on:
+  push:
+    paths: ['src/**.b64']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  decode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p images
+          for f in src/*.b64; do n=$(basename "$f" .b64); base64 -d "$f" > "images/$n"; done
+          git config user.name "aivision-bot"
+          git config user.email "aivision147@gmail.com"
+          git add images
+          git diff --cached --quiet || (git commit -m "Decode images" && git push)
